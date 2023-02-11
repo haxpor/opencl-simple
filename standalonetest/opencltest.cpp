@@ -100,13 +100,13 @@ int main() {
 		return -1;
 	}
 
+	std::chrono::duration<double, std::milli> exec_time = std::chrono::steady_clock::now() - start;
+	std::cout << "elapsed time: " << exec_time.count() << "ms" << std::endl;
+
 	// check the result
 	for (int i = 0; i < SIZE; i++) {
 		assert(c[i] == SIZE + 1);
 	}
-
-	std::chrono::duration<double, std::milli> exec_time = std::chrono::steady_clock::now() - start;
-	std::cout << "elapsed time: " << exec_time.count() << "ms" << std::endl;
 
     return 0;
 }
