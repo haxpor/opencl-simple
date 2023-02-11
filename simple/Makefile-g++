@@ -1,0 +1,17 @@
+.PHONY: all clean libopenclsimple.so main.exe
+
+COMPILER := g++
+FLAGS := -O2 -fno-rtti -std=c++17 -Wall -Wextra
+MORE_FLAGS ?=
+
+all: libopenclsimple.so main.out
+
+libopenclsimple.so: openclsimple.cpp openclsimple.h
+	# NOTE: notice capital letters in -lOpenCL
+	$(COMPILER) -shared $(FLAGS) $(MORE_FLAGS) -I. -fPIC -o $@ $< -lOpenCL
+
+main.out: main.cpp libopenclsimple.so
+	$(COMPILER) $(FLAGS) $(MORE_FLAGS) -I. -o $@ $< -L. -lopenclsimple
+
+clean:
+	rm -f libopenclsimple.so main.out
