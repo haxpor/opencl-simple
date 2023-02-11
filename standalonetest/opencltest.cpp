@@ -11,39 +11,42 @@
 #include <cmath>
 
 int main() {
-    // Get the platform
-    std::vector<cl::Platform> platforms;
-    cl::Platform::get(&platforms);
-    cl::Platform platform = platforms[0];
+	// Get the platform
+	std::vector<cl::Platform> platforms;
+	cl::Platform::get(&platforms);
+	cl::Platform platform = platforms[0];
 
-    // Get the device
-    std::vector<cl::Device> devices;
-    platform.getDevices(CL_DEVICE_TYPE_GPU, &devices);
-    cl::Device device = devices[0];
+	// Get the device
+	std::vector<cl::Device> devices;
+	platform.getDevices(CL_DEVICE_TYPE_GPU, &devices);
+	cl::Device device = devices[0];
 
-    // Create the context
-    cl::Context context(device);
+	// validate that it is GPU
+	assert(device.getInfo<CL_DEVICE_TYPE>() == CL_DEVICE_TYPE_GPU);
 
-    // Create the command queue
-    cl::CommandQueue queue(context, device);
+	// Create the context
+	cl::Context context(device);
 
-    // Create the kernel
-    std::string kernelCode = "__kernel void add(__global int* a, __global int* b, __global int* c, int size) { "
-                             "    int i = get_global_id(0);"
-							 "	  if (i < size)"
-                             "		c[i] = a[i] + b[i];"
-                             "}";
-    cl::Program::Sources sources;
-    sources.push_back({kernelCode.c_str(), kernelCode.length()});
-    cl::Program program(context, sources);
-    if (auto ret_code = program.build({device});
-	    ret_code != CL_SUCCESS) {
+	// Create the command queue
+	cl::CommandQueue queue(context, device);
+
+	// Create the kernel
+	std::string kernelCode = "__kernel void add(__global int* a, __global int* b, __global int* c, int size) { "
+		"    int i = get_global_id(0);"
+		"	  if (i < size)"
+		"		c[i] = a[i] + b[i];"
+		"}";
+	cl::Program::Sources sources;
+	sources.push_back({kernelCode.c_str(), kernelCode.length()});
+	cl::Program program(context, sources);
+	if (auto ret_code = program.build({device});
+		ret_code != CL_SUCCESS) {
 		std::cerr << "Error cl::Program::build, code=" << ret_code << std::endl;
 		return -1;
 	}
-    cl::Kernel kernel(program, "add");
+	cl::Kernel kernel(program, "add");
 
-    // Create the input and output arrays
+	// Create the input and output arrays
 	const int SIZE = 10000000;
 	std::vector<int> a(SIZE);
 	std::vector<int> b(SIZE);
@@ -53,10 +56,10 @@ int main() {
 	std::iota(a.begin(), a.end(), 1);
 	std::iota(b.rbegin(), b.rend(), 1);
 
-    // Create the buffer
-    cl::Buffer bufferA(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int) * a.size(), a.data());
-    cl::Buffer bufferB(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int) * b.size(), b.data());
-    cl::Buffer bufferC(context, CL_MEM_WRITE_ONLY, sizeof(int) * c.size());
+	// Create the buffer
+	cl::Buffer bufferA(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int) * a.size(), a.data());
+	cl::Buffer bufferB(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int) * b.size(), b.data());
+	cl::Buffer bufferC(context, CL_MEM_WRITE_ONLY, sizeof(int) * c.size());
 
 	{
 		cl::Event write_bufferA_event, write_bufferB_event;
@@ -75,10 +78,10 @@ int main() {
 		cl::Event::waitForEvents({write_bufferA_event, write_bufferB_event});
 	}
 
-    // Set the kernel arguments
-    kernel.setArg(0, bufferA);
-    kernel.setArg(1, bufferB);
-    kernel.setArg(2, bufferC);
+	// Set the kernel arguments
+	kernel.setArg(0, bufferA);
+	kernel.setArg(1, bufferB);
+	kernel.setArg(2, bufferC);
 	kernel.setArg(3, SIZE);
 
 	auto start = std::chrono::steady_clock::now();
@@ -89,7 +92,7 @@ int main() {
 		std::cerr << "Error enqueueNDRangeKernel() code=" << ret_code << std::endl;
 		return -1;
 	}
-	
+
 	// Read the result
 	if (auto ret_code = queue.enqueueReadBuffer(bufferC, CL_TRUE, 0, sizeof(int) * c.size(), c.data());
 		ret_code != CL_SUCCESS) {
@@ -105,6 +108,6 @@ int main() {
 		assert(c[i] == SIZE + 1);
 	}
 
-    return 0;
+	return 0;
 }
 
