@@ -155,18 +155,6 @@ CLSIMPLE_API int clsimple_compute(const int arr_1[], const int arr_2[], int arr_
 	kernel.setArg(3, num_elem);
 
 	DLOG(__FUNCTION__, "%s", "passed setting all arguments");
-	
-
-	// transfer data from host to device
-	// NOTE: in testing, I don't need to call these functions
-	cl::Event event_buffer_a_write;
-	cl::Event event_buffer_b_write;
-
-	ret_code = queue.enqueueWriteBuffer(buffer_a, CL_FALSE, 0, sizeof(int) * num_elem, arr_1, nullptr, &event_buffer_a_write);
-	ret_code = queue.enqueueWriteBuffer(buffer_b, CL_FALSE, 0, sizeof(int) * num_elem, arr_2, nullptr, &event_buffer_b_write);
-
-	std::vector<cl::Event> to_wait_events = {event_buffer_a_write, event_buffer_b_write};
-	cl::Event::waitForEvents(to_wait_events);
 
 	// execute the kernel function
 	// NOTE: this is a blocking call although enqueuing is async call but the current thread
