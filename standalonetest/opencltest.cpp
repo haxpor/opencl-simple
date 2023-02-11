@@ -4,7 +4,6 @@
 #include <CL/cl2.hpp>
 
 #include <iostream>
-#include <algorithm>
 #include <chrono>
 #include <vector>
 #include <numeric>
@@ -52,9 +51,7 @@ int main() {
 
 	// prepare data
 	std::iota(a.begin(), a.end(), 1);
-	
-	std::iota(b.begin(), b.end(), 1);
-	std::reverse(b.begin(), b.end());
+	std::iota(b.rbegin(), b.rend(), 1);
 
     // Create the buffer
     cl::Buffer bufferA(context, CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR, sizeof(int) * a.size(), a.data());
