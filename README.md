@@ -24,10 +24,23 @@ Install the following debian-based package
 Those `.dll` files in each directory is a sym-link file to installed `.dll` via Mingw64, and Wine on
 users' Linux system. See following detail.
 
-* `ligcc_s_seh-1.dll` - as part of Mingw64
+* `libgcc_s_seh-1.dll` - as part of Mingw64
 * `libstdc++-6.dll` - as part of Mingw64
 * `libwinpthread-1.dll` - as part of Mingw64
-* `opencl.dll` - as part of Wine
+
+Those symlink files points to the wine prefix as of `~/.mt5` which is the default
+installation path of MetaTrader 5. In case you install into different path, you
+have to update its location via the following command line.
+
+```
+ln -sf <new-path> ./libgcc_s_seh-1.dll
+```
+
+to update path that symlink file `libgcc_s_seh-1.dll` would be pointing to to `<new-path>`.
+
+# How to build
+
+See `README.md` of each sub-project.
 
 # License
 GNU GPL-3.0, Wasin Thonkaew
