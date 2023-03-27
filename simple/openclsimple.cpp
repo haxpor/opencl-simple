@@ -154,7 +154,6 @@ CLSIMPLE_API int clsimple_compute(const int arr_1[], const int arr_2[], int arr_
 
 	DLOG(__FUNCTION__, "%s", "passed building a kernel program");
 
-	// TODO: pre-create more kernel like this to save time in creating context, kernel, etc
 	cl::Kernel kernel(program, "add");
 
 	DLOG(__FUNCTION__, "%s", "passed adding kernel function");
