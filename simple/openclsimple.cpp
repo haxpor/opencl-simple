@@ -44,9 +44,7 @@ CLSIMPLE_API void clsimple_listall(char* out, int len, bool utf16) noexcept {
 	for (size_t i=0; i<platforms.size(); ++i) {
 		auto& p = platforms[i];
 
-		// temporary variables to hold temporary platform/device informatin
 		std::string tmp_str;
-		cl_device_type tmp_device_type;
 
 		ret_code = p.getInfo(CL_PLATFORM_NAME, &tmp_str);
 		if (ret_code != CL_SUCCESS)
@@ -69,6 +67,7 @@ CLSIMPLE_API void clsimple_listall(char* out, int len, bool utf16) noexcept {
 
 		for (size_t j=0; j<devices.size(); ++j) {
 			const auto& d = devices[j];
+			cl_device_type tmp_device_type;
 
 			ret_code = d.getInfo(CL_DEVICE_NAME, &tmp_str);
 			if (ret_code != CL_SUCCESS)
