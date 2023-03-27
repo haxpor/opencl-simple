@@ -19,6 +19,10 @@ Install the following debian-based package
 * `winehq-devel` (or `winehq-stable` or `winehq-staging`, but recommend to use `-devel` package with MT5)
 * MetaTrader 5
 
+# How to build
+
+See `README.md` of each sub-project.
+
 # Note
 
 Those `.dll` files in each directory is a sym-link file to installed `.dll` via Mingw64, and Wine on
@@ -38,9 +42,10 @@ ln -sf <new-path> ./libgcc_s_seh-1.dll
 
 to update path that symlink file `libgcc_s_seh-1.dll` would be pointing to to `<new-path>`.
 
-# How to build
+---
 
-See `README.md` of each sub-project.
+This repository accompanies the article series on mql5.com. The first part of the series
+can be found [here](https://www.mql5.com/en/articles/12108).
 
 # License
 GNU GPL-3.0, Wasin Thonkaew
