@@ -101,7 +101,6 @@ CLSIMPLE_API void clsimple_listall(char* out, int len, bool utf16) noexcept {
 }
 
 CLSIMPLE_API int clsimple_compute(const int arr_1[], const int arr_2[], int arr_3[], int num_elem) noexcept {
-	// TODO: extract this to outside common
 	cl_int ret_code = CL_SUCCESS;
 
 	// Get the platform
@@ -178,7 +177,6 @@ CLSIMPLE_API int clsimple_compute(const int arr_1[], const int arr_2[], int arr_
 	// will be blocked until he work is done. Work is done doesn't mean that the result buffer
 	// will be written back at the same time.
 	//
-	// TODO: local size should be queried via opencl api
 	ret_code = queue.enqueueNDRangeKernel(kernel, cl::NullRange, cl::NDRange(num_elem), cl::NullRange);
 	if (ret_code != CL_SUCCESS) {
 		std::cerr << "Error cl::CommandQueue::enqueueNDRangeKernel(), code=" << ret_code << std::endl;
