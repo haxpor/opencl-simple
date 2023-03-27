@@ -110,8 +110,13 @@ CLSIMPLE_API int clsimple_compute(const int arr_1[], const int arr_2[], int arr_
 		return ret_code;
 	}
 	DLOG(__FUNCTION__, "found %d platform(s)", platforms.size());
-	cl::Platform platform = platforms[0];
 
+	if (platforms.empty()) {
+		std::cerr << "Error found 0 platform." << std::endl;
+		return CL_DEVICE_NOT_FOUND;		// reuse this error value
+	}
+
+	cl::Platform platform = platforms[0];
 	DLOG(__FUNCTION__, "%s", "passed getting platforms");
 
 	// Get the device
@@ -123,8 +128,11 @@ CLSIMPLE_API int clsimple_compute(const int arr_1[], const int arr_2[], int arr_
 	}
 	DLOG(__FUNCTION__, "found %d GPU device(s)", devices.size());
 
+	if (devices.empty()) {
+		std::cerr << "Error found 0 device." << std::endl;
+		return CL_DEVICE_NOT_FOUND;
+	}
 	cl::Device device = devices[0];
-
 	DLOG(__FUNCTION__, "%s", "passed getting a GPU device");
 
 	// Create the context
