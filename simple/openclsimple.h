@@ -11,7 +11,7 @@
 #endif
 
 /**
- * We didn't define CL_HPP_ENABLE_EXCEPTIONS thus there would be no exceptions thorwn
+ * We didn't define CL_HPP_ENABLE_EXCEPTIONS thus there would be no exceptions thrown
  * from any OpenCL related API.
  */
 extern "C" {
