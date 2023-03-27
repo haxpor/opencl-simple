@@ -6,12 +6,18 @@ MORE_FLAGS ?=
 
 all: libopenclsimple.so main.out
 
-libopenclsimple.so: openclsimple.cpp openclsimple.h
-	# NOTE: notice capital letters in -lOpenCL
-	$(COMPILER) -shared $(FLAGS) $(MORE_FLAGS) -I. -fPIC -o $@ $< -lOpenCL
+libopenclsimple.so: util.o openclsimple.o
+	@# NOTE: notice capital letters in -lOpenCL
+	$(COMPILER) -shared $(FLAGS) $(MORE_FLAGS) -I. -fPIC -o $@ $^ -lOpenCL
+
+openclsimple.o: openclsimple.cpp openclsimple.h util.h
+	$(COMPILER) $(FLAGS) $(MORE_FLAGS) -I. -fPIC -o $@ -c $<
+
+util.o: util.cpp util.h
+	$(COMPILER) $(FLAGS) $(MORE_FLAGS) -I. -fPIC -o $@ -c $<
 
 main.out: main.cpp libopenclsimple.so
 	$(COMPILER) $(FLAGS) $(MORE_FLAGS) -I. -o $@ $< -L. -lopenclsimple
 
 clean:
-	rm -f libopenclsimple.so main.out
+	rm -f libopenclsimple.so main.out util.o openclsimple.o

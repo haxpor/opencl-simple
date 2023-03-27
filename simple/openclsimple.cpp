@@ -1,11 +1,14 @@
 #include "openclsimple.h"
+#include "util.h"
 
 #define CL_HPP_TARGET_OPENCL_VERSION 120
 #define CL_HPP_MINIMUM_OPENCL_VERSION 120
 
-#include <iostream>
 #include <CL/cl2.hpp>
+
+#include <iostream>
 #include <vector>
+#include <sstream>
 
 #ifdef ENABLE_DEBUG
 #include <cstdarg>
@@ -27,7 +30,7 @@ inline void DLOG(const char* ctx, const char* format, ...) {
 	#define DLOG(...)
 #endif
 
-CLSIMPLE_API void clsimple_listall() noexcept {
+CLSIMPLE_API void clsimple_listall(char* out, int len, bool utf16) noexcept {
 	// Get the platform
 	std::vector<cl::Platform> platforms;
 	int ret_code = cl::Platform::get(&platforms);
@@ -36,21 +39,26 @@ CLSIMPLE_API void clsimple_listall() noexcept {
 		return;
 	}
 
-	std::string tmp_str;
-	cl_device_type tmp_device_type;
+	std::stringstream output_str;
 
-	for (auto& p : platforms) {
+	for (size_t i=0; i<platforms.size(); ++i) {
+		auto& p = platforms[i];
+
+		// temporary variables to hold temporary platform/device informatin
+		std::string tmp_str;
+		cl_device_type tmp_device_type;
+
 		ret_code = p.getInfo(CL_PLATFORM_NAME, &tmp_str);
 		if (ret_code != CL_SUCCESS)
 			std::cerr << "Error cl::Platform::getInfo(), code=" << ret_code << std::endl;
 		else
-			std::cout << "Platform: " << tmp_str << std::endl;
+			output_str << "[" << i << "] Platform: " << tmp_str << std::endl;
 		
 		ret_code = p.getInfo(CL_PLATFORM_VENDOR, &tmp_str);
 		if (ret_code != CL_SUCCESS)
 			std::cerr << "Error cl::Platform::getInfo(), code=" << ret_code << std::endl;
 		else
-			std::cout << "Vendor: " << tmp_str << std::endl;
+			output_str << "Vendor: " << tmp_str << std::endl;
 
 		std::vector<cl::Device> devices;
 		ret_code = p.getDevices(CL_DEVICE_TYPE_ALL, &devices);
@@ -59,28 +67,37 @@ CLSIMPLE_API void clsimple_listall() noexcept {
 			continue;
 		}
 
-		for (const auto& d : devices) {
+		for (size_t j=0; j<devices.size(); ++j) {
+			const auto& d = devices[j];
+
 			ret_code = d.getInfo(CL_DEVICE_NAME, &tmp_str);
 			if (ret_code != CL_SUCCESS)
 				std::cerr << "Error cl::Device::getInfo(), code=" << ret_code << std::endl;
 			else
-				std::cout << " -Device name: " << tmp_str << std::endl;
+				output_str << " -[" << j << "] Device name: " << tmp_str << std::endl;
 
 			ret_code = d.getInfo(CL_DEVICE_TYPE, &tmp_device_type);
 			if (ret_code != CL_SUCCESS)
 				std::cerr << "Error cl::Device::getInfo(), code=" << ret_code << std::endl;
 			else {
 				if (tmp_device_type & CL_DEVICE_TYPE_GPU)
-					std::cout << " -Type: GPU" << std::endl;
+					output_str << " -Type: GPU" << std::endl;
 				else if (tmp_device_type & CL_DEVICE_TYPE_CPU)
-					std::cout << " -Type: CPU" << std::endl;
+					output_str << " -Type: CPU" << std::endl;
 				else if (tmp_device_type & CL_DEVICE_TYPE_ACCELERATOR)
-					std::cout << " -Type: Accelerator" << std::endl;
+					output_str << " -Type: Accelerator" << std::endl;
 				else
-					std::cout << " -Type: Unknown" << std::endl;
+					output_str << " -Type: Unknown" << std::endl;
 			}
 		}
 	}
+
+	// keep a copy of the string from stringstream
+	std::string copy_str = output_str.str();
+	if (utf16)
+		util::str_to_cstr_u16(copy_str, out, len);
+	else
+		util::str_to_cstr(copy_str, out, len);
 }
 
 CLSIMPLE_API int clsimple_compute(const int arr_1[], const int arr_2[], int arr_3[], int num_elem) noexcept {
