@@ -7,6 +7,8 @@ MORE_FLAGS ?=
 all: main.exe
 
 main.exe: opencltest.cpp
+	@# check if symbolic link file to wine's opencl.dll exists, if not then create one
+	test -h opencl.dll && echo "opencl.dll exists, no need to create symbolic link again" || ln -s ~/.mt5/drive_c/windows/system32/opencl.dll ./opencl.dll
 	$(COMPILER) $(FLAGS) $(MORE_FLAGS) -I. -o $@ $< -L. -lopencl
 
 clean:
